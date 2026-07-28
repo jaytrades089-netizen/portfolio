@@ -80,16 +80,26 @@
   }
 
   /* process loop — order carries real meaning here (audit happens before fix, always) */
-  .loop { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:28px 0; counter-reset:loopstep; }
+  .loop { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:28px 0; counter-reset:loopstep; align-items:start; }
   .loop-step { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:16px 12px; text-align:center; position:relative; }
   .loop-step .icon { font-size:26px; margin-bottom:8px; display:block; }
   .loop-step .t { font-weight:800; font-size:13px; }
   .loop-step .d { font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.45; }
-  .loop-step::before { counter-increment:loopstep; content:counter(loopstep); position:absolute; top:-10px; left:-6px; width:24px; height:24px; border-radius:50%; background:var(--peach); color:#1c1207; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .loop-step::before { counter-increment:loopstep; content:counter(loopstep); position:absolute; top:-10px; left:-6px; width:24px; height:24px; border-radius:50%; background:var(--peach); color:#1c1207; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; z-index:1; }
   .loop-step.pulse { animation:stepPulse 3.4s ease-in-out infinite; }
   .loop-step:nth-child(2).pulse { animation-delay:0.4s; } .loop-step:nth-child(3).pulse { animation-delay:0.8s; }
   .loop-step:nth-child(4).pulse { animation-delay:1.2s; } .loop-step:nth-child(5).pulse { animation-delay:1.6s; }
   @keyframes stepPulse { 0%,100% { border-color:var(--navy-lighter); } 12% { border-color:var(--peach); box-shadow:0 0 22px rgba(255,155,94,0.18); } 30% { border-color:var(--navy-lighter); } }
+
+  /* expandable loop steps — one worked example threaded through all five */
+  details.loop-step summary { list-style:none; cursor:pointer; }
+  details.loop-step summary::-webkit-details-marker { display:none; }
+  details.loop-step summary::marker { content:""; }
+  details.loop-step .loop-expand { display:block; margin-top:8px; font-size:14px; font-weight:800; color:var(--muted); transition:transform 0.2s ease, color 0.2s ease; }
+  details.loop-step[open] .loop-expand { transform:rotate(45deg); color:var(--peach); }
+  details.loop-step .loop-detail { margin-top:12px; padding-top:12px; border-top:1px solid var(--navy-lighter); font-size:11.5px; color:var(--offwhite); line-height:1.6; text-align:left; }
+  details.loop-step .loop-detail b { color:var(--peach); display:block; margin-bottom:3px; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; }
+  .loop-cap { text-align:center; font-size:12px; color:var(--muted); margin:-10px 0 22px; }
 
   .callout { background:var(--navy-light); border:1px solid var(--navy-lighter); border-left:4px solid var(--teal); border-radius:10px; padding:16px 18px; margin:20px 0; font-size:14px; color:var(--muted); }
   .callout b { color:var(--teal); }
@@ -147,12 +157,28 @@
   </div>
 
   <div class="loop reveal">
-    <div class="loop-step pulse"><span class="icon">🔍</span><div class="t">Audit</div><div class="d">Read-only pass through the workflow — nothing gets touched yet</div></div>
-    <div class="loop-step pulse"><span class="icon">📋</span><div class="t">Findings Report</div><div class="d">What's broken, why, and what the fix involves — in writing</div></div>
-    <div class="loop-step pulse"><span class="icon">✅</span><div class="t">Your Approval</div><div class="d">You see the scope before anything changes</div></div>
-    <div class="loop-step pulse"><span class="icon">🔧</span><div class="t">Fix</div><div class="d">The change gets made — scoped to exactly what was approved</div></div>
-    <div class="loop-step pulse"><span class="icon">🟢</span><div class="t">Verify Running</div><div class="d">Tested and executing live — not just "should work"</div></div>
+    <details class="loop-step pulse">
+      <summary><span class="icon">🔍</span><div class="t">Audit</div><div class="d">Read-only pass through the workflow — nothing gets touched yet</div><span class="loop-expand">+</span></summary>
+      <div class="loop-detail"><b>What I found</b>The CRM Write node was failing on every execution. Webhook and Filter nodes ran clean — the break was isolated to one node, not the whole workflow.</div>
+    </details>
+    <details class="loop-step pulse">
+      <summary><span class="icon">📋</span><div class="t">Findings Report</div><div class="d">What's broken, why, and what the fix involves — in writing</div><span class="loop-expand">+</span></summary>
+      <div class="loop-detail"><b>Report sent to client</b>Issue: CRM Write failing silently on every run. Cause: the CRM's API schema changed last month — the workflow was still sending the old field name. Fix: update the field mapping, add error handling so a future mismatch fails loud instead of silent. Est. 45 min.</div>
+    </details>
+    <details class="loop-step pulse">
+      <summary><span class="icon">✅</span><div class="t">Your Approval</div><div class="d">You see the scope before anything changes</div><span class="loop-expand">+</span></summary>
+      <div class="loop-detail"><b>Client reply</b>"Yep, go ahead — didn't realize that field had changed on their end." Scope confirmed: field mapping fix + error handling. Nothing else gets touched.</div>
+    </details>
+    <details class="loop-step pulse">
+      <summary><span class="icon">🔧</span><div class="t">Fix</div><div class="d">The change gets made — scoped to exactly what was approved</div><span class="loop-expand">+</span></summary>
+      <div class="loop-detail"><b>What changed</b>Updated the CRM Write node's field mapping to match the current schema. Added a try/catch branch that posts a Slack alert if the write ever fails again — so it can't go silent a second time.</div>
+    </details>
+    <details class="loop-step pulse">
+      <summary><span class="icon">🟢</span><div class="t">Verify Running</div><div class="d">Tested and executing live — not just "should work"</div><span class="loop-expand">+</span></summary>
+      <div class="loop-detail"><b>Confirmed</b>Three manual test executions with synthetic data — all wrote clean to the CRM. Activated the workflow and confirmed the first live execution succeeded. Closed out.</div>
+    </details>
   </div>
+  <p class="loop-cap reveal">Tap any step to see a real example — one bug, followed start to finish.</p>
 
   <div class="rule-box reveal">
     <div class="rb-title">⚡ WHAT "DONE" MEANS HERE</div>
