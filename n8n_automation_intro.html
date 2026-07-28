@@ -53,6 +53,32 @@
   .card .c-title.blue { color:var(--blue); } .card .c-title.amber { color:var(--amber); }
   .card .c-title.green { color:var(--green); } .card .c-title.purple { color:var(--purple); }
 
+  /* expandable service cards */
+  details.card summary { list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  details.card summary::-webkit-details-marker { display:none; }
+  details.card summary::marker { content:""; }
+  details.card .expand-icon { color:var(--muted); font-size:19px; font-weight:800; line-height:1; flex-shrink:0; transition:transform 0.2s ease, color 0.2s ease; }
+  details.card[open] .expand-icon { transform:rotate(45deg); color:var(--peach); }
+  details.card .card-detail { font-size:13.5px; color:var(--offwhite); margin-top:13px; padding-top:13px; border-top:1px solid var(--navy-lighter); line-height:1.65; }
+  details.card .card-detail b { color:var(--peach); }
+
+  /* n8n-style workflow canvas — dot grid + connected node chips */
+  .n8n-canvas { background:#eef0f3; border-radius:16px; padding:34px 22px; margin:26px 0; background-image:radial-gradient(circle, #d3d7de 1.4px, transparent 1.4px); background-size:20px 20px; }
+  .n8n-nodes { display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap; }
+  .n8n-node { background:#fff; border:1.5px solid #dfe2e8; border-radius:9px; padding:9px 13px; display:flex; align-items:center; gap:7px; box-shadow:0 3px 8px rgba(20,24,32,0.08); font-size:12px; font-weight:700; color:#2A2F36; white-space:nowrap; }
+  .n8n-node .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .n8n-node.trigger .dot { background:var(--peach); }
+  .n8n-node.logic .dot { background:var(--blue); }
+  .n8n-node.action .dot { background:var(--green); }
+  .n8n-connector { width:34px; height:2px; background:repeating-linear-gradient(90deg, #b7bcc6 0 6px, transparent 6px 11px); position:relative; margin:0 2px; }
+  .n8n-connector::after { content:"▸"; position:absolute; right:-3px; top:-8px; font-size:11px; color:#9aa0ab; }
+  .n8n-cap { text-align:center; font-size:11px; color:var(--muted); margin-top:18px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; }
+  @media (max-width:640px) {
+    .n8n-nodes { flex-direction:column; }
+    .n8n-connector { width:2px; height:22px; background:repeating-linear-gradient(180deg, #b7bcc6 0 6px, transparent 6px 11px); margin:2px 0; }
+    .n8n-connector::after { content:"▾"; right:-6px; top:auto; bottom:-3px; }
+  }
+
   /* process loop — order carries real meaning here (audit happens before fix, always) */
   .loop { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:28px 0; counter-reset:loopstep; }
   .loop-step { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:16px 12px; text-align:center; position:relative; }
@@ -105,6 +131,21 @@
   <h3 class="sec-title reveal">Diagnostic-first, every time</h3>
   <p class="body reveal">Most people who say "I can fix your automation" mean they'll poke around until something changes. That's how workflows end up more broken than they started. Every engagement here runs the same five steps, in this order, no exceptions — because the order is the whole point.</p>
 
+  <div class="n8n-canvas reveal">
+    <div class="n8n-nodes">
+      <div class="n8n-node trigger"><span class="dot"></span>Webhook Trigger</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node logic"><span class="dot"></span>IF / Filter</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node logic"><span class="dot"></span>Set Fields</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node action"><span class="dot"></span>CRM Write</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node action"><span class="dot"></span>Send Email</div>
+    </div>
+    <div class="n8n-cap">A typical n8n workflow — this is the canvas I actually work in</div>
+  </div>
+
   <div class="loop reveal">
     <div class="loop-step pulse"><span class="icon">🔍</span><div class="t">Audit</div><div class="d">Read-only pass through the workflow — nothing gets touched yet</div></div>
     <div class="loop-step pulse"><span class="icon">📋</span><div class="t">Findings Report</div><div class="d">What's broken, why, and what the fix involves — in writing</div></div>
@@ -120,14 +161,39 @@
 
   <h2 class="sec reveal">What I Fix &amp; Build</h2>
   <h3 class="sec-title reveal">n8n workflows, end to end</h3>
+  <p class="body reveal" style="font-size:14px; color:var(--muted);">Tap any card for how the build actually works.</p>
 
   <div class="grid3 reveal">
-    <div class="card"><div class="c-title peach">🐛 Bug Fixes &amp; Rescue</div><p>Broken triggers, failed connections, silent errors, orphaned nodes. The most common call: "this used to work."</p></div>
-    <div class="card"><div class="c-title teal">📥 Lead Capture &amp; CRM</div><p>Form fills in, gets qualified, lands in the CRM, and a follow-up goes out — with no human touch required.</p></div>
-    <div class="card"><div class="c-title blue">💵 Invoice Chasing</div><p>Watches for overdue invoices, sends reminders, flags discrepancies, keeps payment status in sync.</p></div>
-    <div class="card"><div class="c-title amber">📅 Appointment Reminders</div><p>Confirmation, reminder sequence, self-serve reschedule — built into your existing booking system.</p></div>
-    <div class="card"><div class="c-title green">💬 Support Chatbots</div><p>Trained on your own docs and FAQs, with real escalation logic — not a generic bot with your logo on it.</p></div>
-    <div class="card"><div class="c-title purple">🩺 Maintenance Retainer</div><p>Monthly health report: what ran, what broke, what got fixed, what got updated. No abandoned projects.</p></div>
+    <details class="card">
+      <summary><div class="c-title peach">🐛 Bug Fixes &amp; Rescue</div><span class="expand-icon">+</span></summary>
+      <p>Broken triggers, failed connections, silent errors, orphaned nodes. The most common call: "this used to work."</p>
+      <div class="card-detail"><b>How it works:</b> Read-only audit against the live workflow, tracing the execution log to isolate exactly where it's failing. Written findings report before anything is touched. Once approved, the fix goes in, gets test-executed, and I confirm it's running clean before calling it done.</div>
+    </details>
+    <details class="card">
+      <summary><div class="c-title teal">📥 Lead Capture &amp; CRM</div><span class="expand-icon">+</span></summary>
+      <p>Form fills in, gets qualified, lands in the CRM, and a follow-up goes out — with no human touch required.</p>
+      <div class="card-detail"><b>How it works:</b> A form submission or webhook triggers the workflow. A filter step checks it against your qualifying criteria, formats the data, and writes it into your CRM through its API. A personalized follow-up email fires automatically — no manual entry, no lead sitting untouched overnight.</div>
+    </details>
+    <details class="card">
+      <summary><div class="c-title blue">💵 Invoice Chasing</div><span class="expand-icon">+</span></summary>
+      <p>Watches for overdue invoices, sends reminders, flags discrepancies, keeps payment status in sync.</p>
+      <div class="card-detail"><b>How it works:</b> The workflow watches your invoicing system on a schedule, flags anything past due, and sends a reminder using rules you set (how many days late, how many follow-ups, tone). Payment status syncs back to your project tracker automatically once it clears.</div>
+    </details>
+    <details class="card">
+      <summary><div class="c-title amber">📅 Appointment Reminders</div><span class="expand-icon">+</span></summary>
+      <p>Confirmation, reminder sequence, self-serve reschedule — built into your existing booking system.</p>
+      <div class="card-detail"><b>How it works:</b> When an appointment is booked, the workflow schedules a reminder sequence — SMS, email, or both — timed however you want (24hr before, morning-of, etc.). If someone needs to reschedule, they can do it themselves through a link, no phone call back to your office required.</div>
+    </details>
+    <details class="card">
+      <summary><div class="c-title green">💬 Support Chatbots</div><span class="expand-icon">+</span></summary>
+      <p>Trained on your own docs and FAQs, with real escalation logic — not a generic bot with your logo on it.</p>
+      <div class="card-detail"><b>How it works:</b> The response layer is built on top of your actual docs and FAQs — not a generic model guessing. Escalation logic routes anything it shouldn't answer on its own straight to a human, and it connects into wherever your customers already are: website, SMS, or a messaging platform.</div>
+    </details>
+    <details class="card">
+      <summary><div class="c-title purple">🩺 Maintenance Retainer</div><span class="expand-icon">+</span></summary>
+      <p>Monthly health report: what ran, what broke, what got fixed, what got updated. No abandoned projects.</p>
+      <div class="card-detail"><b>How it works:</b> An error-monitoring workflow watches everything built for you and alerts on failures before you'd notice them yourself. Every month you get a one-page report — what ran, what broke, what got fixed, what got updated — so "is this still working" is never a question you have to ask.</div>
+    </details>
   </div>
 
   <h2 class="sec reveal">Proof It Works</h2>
