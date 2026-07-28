@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteToServe — What It Is &amp; How It Works</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #2A2F36; --navy-light: #353c45; --navy-lighter: #404850;
+    --page-dark: #060914;
+    --peach: #FF9B5E; --peach-dim: rgba(255,155,94,0.15);
+    --offwhite: #F0F2F5; --muted: #9EA4AD; --muted-dim: rgba(158,164,173,0.2);
+    --teal: #2dd4bf; --teal-dim: rgba(45,212,191,0.12);
+    --blue: #60a5fa; --blue-dim: rgba(96,165,250,0.12);
+    --amber: #e0a84a; --amber-dim: rgba(224,168,74,0.12);
+    --green: #4ade80; --green-dim: rgba(74,222,128,0.12);
+    --purple: #a78bfa; --purple-dim: rgba(167,139,250,0.16);
+    --rose: #f472b6;
+  }
+  body { font-family:'Manrope',sans-serif; background:var(--page-dark); color:var(--offwhite); line-height:1.65; overflow-x:hidden; }
+
+  /* ===== hero ===== */
+  .hero { min-height:88vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:60px 24px; position:relative; background:radial-gradient(ellipse at 50% -20%, rgba(255,155,94,0.14) 0%, transparent 55%), linear-gradient(180deg, var(--navy) 0%, var(--page-dark) 85%); }
+  .hero .badge-logo { width:84px; height:84px; background:var(--peach); border-radius:20px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:26px; color:#1c1207; margin-bottom:26px; animation:logoIn 0.9s cubic-bezier(.2,.9,.3,1.2) both; box-shadow:0 18px 50px rgba(255,155,94,0.25); }
+  @keyframes logoIn { from { transform:scale(0.4) rotate(-12deg); opacity:0; } to { transform:scale(1) rotate(0); opacity:1; } }
+  .hero h1 { font-size:clamp(34px, 6vw, 58px); font-weight:800; letter-spacing:-1px; animation:riseIn 0.8s 0.15s both; }
+  .hero h1 .accent { color:var(--peach); }
+  .hero .tagline { font-size:clamp(17px, 2.6vw, 24px); color:var(--muted); margin-top:14px; max-width:640px; animation:riseIn 0.8s 0.35s both; }
+  .hero .tagline b { color:var(--offwhite); }
+  .hero .scroll-hint { position:absolute; bottom:28px; color:var(--muted); font-size:12px; letter-spacing:2px; text-transform:uppercase; animation:bob 2.2s ease-in-out infinite; }
+  @keyframes riseIn { from { transform:translateY(26px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+  @keyframes bob { 0%,100% { transform:translateY(0); opacity:0.55; } 50% { transform:translateY(7px); opacity:1; } }
+
+  .wrap { max-width:960px; margin:0 auto; padding:24px; }
+  h2.sec { font-size:13px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--peach); margin:72px 0 6px; }
+  h3.sec-title { font-size:clamp(22px, 3.4vw, 30px); font-weight:800; letter-spacing:-0.4px; margin:0 0 16px; }
+  p.body { color:var(--offwhite); margin:0 0 15px; max-width:760px; font-size:16px; }
+  p.body .em { color:var(--peach); font-weight:700; }
+  p.note { color:var(--muted); font-size:14px; max-width:760px; margin:0 0 14px; }
+
+  /* scroll reveal */
+  .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+
+  .rule-box { background:var(--navy-light); border:1px solid var(--peach); border-left:5px solid var(--peach); border-radius:12px; padding:22px 24px; margin:24px 0; }
+  .rule-box .rb-title { font-weight:800; color:var(--peach); font-size:15px; letter-spacing:0.5px; margin-bottom:6px; }
+  .rule-box p { color:var(--offwhite); font-size:15px; }
+
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin:20px 0; }
+  .card { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:18px; transition:transform 0.25s ease, border-color 0.25s ease; }
+  .card:hover { transform:translateY(-4px); border-color:var(--peach); }
+  .card .c-title { font-weight:800; font-size:15px; margin-bottom:6px; }
+  .card p { font-size:14px; color:var(--muted); }
+  .card .c-title.peach { color:var(--peach); } .card .c-title.teal { color:var(--teal); }
+  .card .c-title.blue { color:var(--blue); } .card .c-title.amber { color:var(--amber); }
+  .card .c-title.green { color:var(--green); } .card .c-title.purple { color:var(--purple); }
+
+  /* ===== the loop ===== */
+  .loop { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin:28px 0; counter-reset:loopstep; }
+  .loop-step { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:16px 12px; text-align:center; position:relative; }
+  .loop-step .icon { font-size:26px; margin-bottom:8px; display:block; }
+  .loop-step .t { font-weight:800; font-size:13px; }
+  .loop-step .d { font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.45; }
+  .loop-step::before { counter-increment:loopstep; content:counter(loopstep); position:absolute; top:-10px; left:-6px; width:24px; height:24px; border-radius:50%; background:var(--peach); color:#1c1207; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .loop-step.pulse { animation:stepPulse 3s ease-in-out infinite; }
+  .loop-step:nth-child(2).pulse { animation-delay:0.4s; } .loop-step:nth-child(3).pulse { animation-delay:0.8s; }
+  .loop-step:nth-child(4).pulse { animation-delay:1.2s; } .loop-step:nth-child(5).pulse { animation-delay:1.6s; }
+  .loop-step:nth-child(6).pulse { animation-delay:2.0s; }
+  @keyframes stepPulse { 0%,100% { border-color:var(--navy-lighter); } 12% { border-color:var(--peach); box-shadow:0 0 22px rgba(255,155,94,0.18); } 30% { border-color:var(--navy-lighter); } }
+
+  /* animated route svg */
+  .route-fig { margin:30px auto; max-width:720px; background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:16px; padding:22px; }
+  .route-fig svg { width:100%; height:auto; display:block; }
+  .route-path { fill:none; stroke:var(--peach); stroke-width:3; stroke-linecap:round; stroke-dasharray:9 7; animation:dash 2.6s linear infinite; }
+  @keyframes dash { to { stroke-dashoffset:-64; } }
+  .route-pin { animation:pinPop 3.6s ease-in-out infinite; transform-origin:center; }
+  .route-pin.p2 { animation-delay:0.7s; } .route-pin.p3 { animation-delay:1.4s; } .route-pin.p4 { animation-delay:2.1s; }
+  @keyframes pinPop { 0%,100% { opacity:0.85; } 10% { opacity:1; } }
+  .fig-cap { text-align:center; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-top:12px; }
+
+  /* qualifiers strip */
+  .qual-strip { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin:24px 0; }
+  .qual { flex:1; min-width:170px; max-width:230px; background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:14px; padding:18px 14px; text-align:center; }
+  .qual .q-name { font-weight:800; font-size:18px; }
+  .qual .q-win { font-size:12px; color:var(--muted); margin-top:4px; }
+  .qual .q-bar { height:8px; border-radius:4px; background:var(--navy); margin-top:12px; position:relative; overflow:hidden; }
+  .qual .q-bar span { position:absolute; top:0; bottom:0; border-radius:4px; animation:fillIn 1.4s ease both; }
+  @keyframes fillIn { from { width:0 !important; } }
+  .qual.am .q-name { color:var(--amber); } .qual.am .q-bar span { left:8%; width:28%; background:var(--amber); }
+  .qual.pm .q-name { color:var(--blue); } .qual.pm .q-bar span { left:60%; width:30%; background:var(--blue); }
+  .qual.wknd .q-name { color:var(--teal); } .qual.wknd .q-bar span { left:8%; width:84%; background:var(--teal); }
+
+  /* attempts timeline */
+  .att-line { display:flex; align-items:center; gap:0; margin:26px 0 8px; }
+  .att-node { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; flex-shrink:0; border:2px solid; animation:nodeIn 0.6s ease both; }
+  .att-node.a1 { border-color:var(--peach); color:var(--peach); background:var(--peach-dim); }
+  .att-node.a2 { border-color:var(--blue); color:var(--blue); background:var(--blue-dim); animation-delay:0.25s; }
+  .att-node.af { border-color:var(--green); color:var(--green); background:var(--green-dim); animation-delay:0.5s; }
+  @keyframes nodeIn { from { transform:scale(0.3); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .att-conn { flex:1; height:2px; background:repeating-linear-gradient(90deg, var(--muted-dim) 0 8px, transparent 8px 14px); }
+  .att-labels { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; max-width:100%; }
+
+  .callout { background:var(--navy-light); border:1px solid var(--navy-lighter); border-left:4px solid var(--teal); border-radius:10px; padding:16px 18px; margin:20px 0; font-size:14px; color:var(--muted); }
+  .callout b { color:var(--teal); }
+  .callout.peach { border-left-color:var(--peach); } .callout.peach b { color:var(--peach); }
+
+  /* stats counters */
+  .big-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin:26px 0; }
+  .bstat { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:14px; padding:20px 14px; text-align:center; }
+  .bstat .v { font-size:34px; font-weight:800; color:var(--peach); }
+  .bstat .l { font-size:11px; color:var(--muted); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:60px 20px 70px; }
+  footer .tagline-end { font-size:18px; font-weight:800; color:var(--offwhite); margin-bottom:8px; }
+  footer .tagline-end .accent { color:var(--peach); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge-logo">RTS</div>
+  <h1>Route<span class="accent">To</span>Serve</h1>
+  <p class="tagline"><b>All you have to do is drive and knock.</b><br>RouteToServe has the rest.</p>
+  <div class="scroll-hint">↓ scroll</div>
+</div>
+
+<div class="wrap">
+
+  <h2 class="sec reveal">Start Here</h2>
+  <h3 class="sec-title reveal">What is process serving — and why does it need an app?</h3>
+  <p class="body reveal">A process server hand-delivers legal documents — lawsuits, garnishments, court notices — to the people named in them. The courts don't just want the paper delivered; they want <span class="em">proof it was attempted properly</span>: multiple attempts at different times of day, spread across enough days, documented with timestamps, GPS, and photos. Miss a requirement and the serve can be thrown out.</p>
+  <p class="body reveal">A working server juggles <span class="em">hundreds of live documents at once</span> — each with its own address, deadline, attempt history, and time-of-day requirements — while driving all day. Before RouteToServe, that meant paper stacks, memory, and re-typing the same addresses over and over.</p>
+
+  <div class="rule-box reveal">
+    <div class="rb-title">⚡ THE KILLER FEATURE</div>
+    <p><b>Persistent route folders — one scan, complete history, no re-entry.</b> A document gets scanned once, on day one. From that moment the app carries everything about it forever: every attempt, every photo, every GPS point, every status change, all the way to the courtroom-ready paper trail. Nothing is ever typed twice.</p>
+  </div>
+
+  <h2 class="sec reveal">The Core Loop</h2>
+  <h3 class="sec-title reveal">From a stack of paper to a paycheck</h3>
+
+  <div class="loop reveal">
+    <div class="loop-step pulse"><span class="icon">📷</span><div class="t">Scan</div><div class="d">Camera reads each document — name, address, due date</div></div>
+    <div class="loop-step pulse"><span class="icon">📁</span><div class="t">Folder</div><div class="d">Docs live in route folders with full history</div></div>
+    <div class="loop-step pulse"><span class="icon">🗺️</span><div class="t">Optimize</div><div class="d">One tap orders the stops into the best drive</div></div>
+    <div class="loop-step pulse"><span class="icon">🚗</span><div class="t">Drive &amp; Knock</div><div class="d">Navigate stop to stop, log every attempt</div></div>
+    <div class="loop-step pulse"><span class="icon">✅</span><div class="t">Complete</div><div class="d">Serve it, post it, or mail it back — with proof</div></div>
+    <div class="loop-step pulse"><span class="icon">💵</span><div class="t">Get Paid</div><div class="d">Every completion prices itself on the pay page</div></div>
+  </div>
+
+  <div class="route-fig reveal">
+    <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg">
+      <path class="route-path" d="M 60 160 C 140 60, 220 60, 290 110 S 430 190, 500 120 S 610 50, 650 70" />
+      <g class="route-pin"><circle cx="60" cy="160" r="11" fill="#FF9B5E"/><text x="60" y="165" text-anchor="middle" font-size="11" font-weight="800" fill="#1c1207">1</text></g>
+      <g class="route-pin p2"><circle cx="290" cy="110" r="11" fill="#FF9B5E"/><text x="290" y="115" text-anchor="middle" font-size="11" font-weight="800" fill="#1c1207">2</text></g>
+      <g class="route-pin p3"><circle cx="500" cy="120" r="11" fill="#FF9B5E"/><text x="500" y="125" text-anchor="middle" font-size="11" font-weight="800" fill="#1c1207">3</text></g>
+      <g class="route-pin p4"><circle cx="650" cy="70" r="11" fill="#4ade80"/><text x="650" y="75" text-anchor="middle" font-size="11" font-weight="800" fill="#1c1207">✓</text></g>
+      <text x="60" y="192" text-anchor="middle" font-size="11" fill="#9EA4AD" font-weight="700">START</text>
+      <text x="650" y="102" text-anchor="middle" font-size="11" fill="#9EA4AD" font-weight="700">DONE</text>
+    </svg>
+    <div class="fig-cap">The app owns the order — the server just drives the line</div>
+  </div>
+
+  <h2 class="sec reveal">The Rules of the Game</h2>
+  <h3 class="sec-title reveal">Qualifiers — proving you tried at the right times</h3>
+  <p class="body reveal">Courts require attempts at <span class="em">different times of day</span>, because a defendant who works days can only be caught at night — and vice versa. RouteToServe bakes these windows in as <span class="em">qualifiers</span>. Every folder tracks which qualifiers its addresses still need, and every scheduled run carries a qualifier tag so the right stops get hit in the right window.</p>
+
+  <div class="qual-strip reveal">
+    <div class="qual am"><div class="q-name">AM</div><div class="q-win">the morning window</div><div class="q-bar"><span></span></div></div>
+    <div class="qual pm"><div class="q-name">PM</div><div class="q-win">the evening window</div><div class="q-bar"><span></span></div></div>
+    <div class="qual wknd"><div class="q-name">WKND</div><div class="q-win">Saturday / Sunday</div><div class="q-bar"><span></span></div></div>
+  </div>
+  <p class="note reveal">The exact window times live in one place — Settings — and every screen in the app respects them. Change them once, everything follows.</p>
+
+  <h3 class="sec-title reveal" style="margin-top:44px;">Attempts — 1, 2, and F</h3>
+  <p class="body reveal">Each address gets a sequence of visits: <span class="em">attempt 1</span>, <span class="em">attempt 2</span>, and the <span class="em">final (F)</span>. The attempts must also be <span class="em">spread</span> across a minimum number of days — you can't knock three times in one afternoon and call it diligence. If nobody answers by the final, the document completes another way: <span class="em">posted</span> to the door (where allowed) or <span class="em">mailed back</span> to the office. Every path ends in a documented completion.</p>
+
+  <div class="att-line reveal">
+    <div class="att-node a1">1</div><div class="att-conn"></div>
+    <div class="att-node a2">2</div><div class="att-conn"></div>
+    <div class="att-node af">F</div>
+  </div>
+  <div class="att-labels reveal"><span>first attempt</span><span>days apart, different windows</span><span>serve · post · mail back</span></div>
+
+  <div class="callout reveal"><b>Every attempt is evidence.</b> Timestamp, GPS location, distance from the pin, notes, photos — captured at the door, attached to the record forever. When a serve is challenged in court, the paper trail is already built.</div>
+
+  <h2 class="sec reveal">The Toolkit</h2>
+  <h3 class="sec-title reveal">What's in the app today</h3>
+
+  <div class="grid3 reveal">
+    <div class="card"><div class="c-title peach">🏠 The Dash</div><p>Home base: every route folder at a glance — status, due dates, scheduled runs with their qualifier tags, and what needs attention today.</p></div>
+    <div class="card"><div class="c-title teal">📷 Scan-In</div><p>Point the camera at a stack of court papers; the app reads names, addresses, and dates and files everything into folders. No typing.</p></div>
+    <div class="card"><div class="c-title blue">🗺️ Route Optimization</div><p>One tap turns a folder (or several) into an ordered drive. Start point, stop order, mileage, ETA — handled.</p></div>
+    <div class="card"><div class="c-title purple">🔗 Combo Routes</div><p>Run several folders together as one big loop when their areas overlap — the app keeps each folder's records straight underneath.</p></div>
+    <div class="card"><div class="c-title amber">📆 Scheduled Serves</div><p>A defendant says "come back at 6" — book it with a real date and time, tied to the address, so the appointment can't slip.</p></div>
+    <div class="card"><div class="c-title green">💵 The Pay Page</div><p>Serves, posts, and mail-backs price themselves as they happen. Turn-in records, pay history, and paystubs — all in one place.</p></div>
+    <div class="card"><div class="c-title teal">📋 The Age List</div><p>The office's master list, reconciled against the app's records — what's served, what's posted, what's mailed, what's still working, and every mismatch flagged.</p></div>
+    <div class="card"><div class="c-title blue">📡 Offline-First</div><p>Dead zones don't stop the day. Attempts log locally and sync when signal returns — the field never waits on the network.</p></div>
+    <div class="card"><div class="c-title peach">🧾 Court-Ready Records</div><p>Receipts and reports generate straight from the data — the same records the server built by simply doing the work.</p></div>
+  </div>
+
+  <h2 class="sec reveal">Who Uses It</h2>
+  <h3 class="sec-title reveal">Built in the field, for the field</h3>
+  <p class="body reveal">RouteToServe is built by a working process server who runs it <span class="em">every single day</span> — every feature exists because a real day in the field demanded it. Veteran servers run it in production, and a boss side gives the office visibility without slowing the field down.</p>
+
+  <div class="big-stats reveal">
+    <div class="bstat"><div class="v">1×</div><div class="l">each address is ever typed</div></div>
+    <div class="bstat"><div class="v">3</div><div class="l">attempts, properly spread</div></div>
+    <div class="bstat"><div class="v">100%</div><div class="l">of attempts carry proof</div></div>
+    <div class="bstat"><div class="v">0</div><div class="l">paper shuffling required</div></div>
+  </div>
+
+  <h2 class="sec reveal">What's Coming</h2>
+  <h3 class="sec-title reveal">The road ahead</h3>
+  <div class="grid3 reveal">
+    <div class="card"><div class="c-title blue">📅 The Calendar</div><p>One lens over everything — schedule, history, money, and a pre-paycheck floor you can see the moment you schedule your week.</p></div>
+    <div class="card"><div class="c-title peach">📦 Master Folders</div><p>Bulk intake for giant mixed stacks: scan once, deal into city piles, and run smart routes off the pile all week.</p></div>
+    <div class="card"><div class="c-title purple">🧠 An Engine of Its Own</div><p>RTS-owned route sequencing — explainable, zone-aware, free to re-run, and the foundation for scheduling that learns how you work.</p></div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="tagline-end">All you have to do is drive and knock.<br><span class="accent">RouteToServe has the rest.</span></div>
+  RouteToServe · Master Introduction · Built Items knowledge base · July 2026
+</footer>
+
+<script>
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
