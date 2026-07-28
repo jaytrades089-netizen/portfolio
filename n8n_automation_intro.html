@@ -79,6 +79,31 @@
     .n8n-connector::after { content:"▾"; right:-6px; top:auto; bottom:-3px; }
   }
 
+  /* bug-canvas — same node styling, reacts live to whichever process step is open */
+  .n8n-node { position:relative; transition:border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease; }
+  .n8n-node .dot { transition:background 0.25s ease; }
+  #bug-canvas .bug-live-cap { text-align:center; font-size:12.5px; font-weight:700; color:#2A2F36; margin-top:16px; transition:color 0.25s ease; }
+  #bug-canvas[data-stage="report"] .n8n-node.crm,
+  #bug-canvas[data-stage="approval"] .n8n-node.crm { border-color:#e24b4a; background:#fdeceb; }
+  #bug-canvas[data-stage="report"] .n8n-node.crm .dot,
+  #bug-canvas[data-stage="approval"] .n8n-node.crm .dot { background:#e24b4a; }
+  #bug-canvas[data-stage="report"] .n8n-node.crm::after,
+  #bug-canvas[data-stage="approval"] .n8n-node.crm::after { content:"!"; position:absolute; top:-8px; right:-8px; width:16px; height:16px; border-radius:50%; background:#e24b4a; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  #bug-canvas[data-stage="report"] .n8n-node.send,
+  #bug-canvas[data-stage="approval"] .n8n-node.send { opacity:0.4; border-style:dashed; }
+  #bug-canvas[data-stage="report"] .n8n-connector.c4,
+  #bug-canvas[data-stage="approval"] .n8n-connector.c4 { opacity:0.4; }
+  #bug-canvas[data-stage="fix"] .n8n-node.crm,
+  #bug-canvas[data-stage="verify"] .n8n-node.crm { border-color:#4ade80; background:#eefbf1; }
+  #bug-canvas[data-stage="fix"] .n8n-node.crm .dot,
+  #bug-canvas[data-stage="verify"] .n8n-node.crm .dot { background:#4ade80; }
+  #bug-canvas[data-stage="verify"] .n8n-node.crm::after { content:"\2713"; position:absolute; top:-8px; right:-8px; width:16px; height:16px; border-radius:50%; background:#4ade80; color:#153a17; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  #bug-canvas[data-stage="verify"] .n8n-node.send { opacity:1; border-style:solid; }
+  #bug-canvas[data-stage="report"] .bug-live-cap,
+  #bug-canvas[data-stage="approval"] .bug-live-cap { color:#a32d2d; }
+  #bug-canvas[data-stage="fix"] .bug-live-cap,
+  #bug-canvas[data-stage="verify"] .bug-live-cap { color:#27500a; }
+
   /* process loop — order carries real meaning here (audit happens before fix, always) */
   .loop { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:28px 0; counter-reset:loopstep; align-items:start; }
   .loop-step { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:16px 12px; text-align:center; position:relative; }
@@ -157,28 +182,43 @@
   </div>
 
   <div class="loop reveal">
-    <details class="loop-step pulse">
+    <details class="loop-step pulse" id="step-audit">
       <summary><span class="icon">🔍</span><div class="t">Audit</div><div class="d">Read-only pass through the workflow — nothing gets touched yet</div><span class="loop-expand">+</span></summary>
       <div class="loop-detail"><b>What I found</b>The CRM Write node was failing on every execution. Webhook and Filter nodes ran clean — the break was isolated to one node, not the whole workflow.</div>
     </details>
-    <details class="loop-step pulse">
+    <details class="loop-step pulse" id="step-report">
       <summary><span class="icon">📋</span><div class="t">Findings Report</div><div class="d">What's broken, why, and what the fix involves — in writing</div><span class="loop-expand">+</span></summary>
       <div class="loop-detail"><b>Report sent to client</b>Issue: CRM Write failing silently on every run. Cause: the CRM's API schema changed last month — the workflow was still sending the old field name. Fix: update the field mapping, add error handling so a future mismatch fails loud instead of silent. Est. 45 min.</div>
     </details>
-    <details class="loop-step pulse">
+    <details class="loop-step pulse" id="step-approval">
       <summary><span class="icon">✅</span><div class="t">Your Approval</div><div class="d">You see the scope before anything changes</div><span class="loop-expand">+</span></summary>
       <div class="loop-detail"><b>Client reply</b>"Yep, go ahead — didn't realize that field had changed on their end." Scope confirmed: field mapping fix + error handling. Nothing else gets touched.</div>
     </details>
-    <details class="loop-step pulse">
+    <details class="loop-step pulse" id="step-fix">
       <summary><span class="icon">🔧</span><div class="t">Fix</div><div class="d">The change gets made — scoped to exactly what was approved</div><span class="loop-expand">+</span></summary>
       <div class="loop-detail"><b>What changed</b>Updated the CRM Write node's field mapping to match the current schema. Added a try/catch branch that posts a Slack alert if the write ever fails again — so it can't go silent a second time.</div>
     </details>
-    <details class="loop-step pulse">
+    <details class="loop-step pulse" id="step-verify">
       <summary><span class="icon">🟢</span><div class="t">Verify Running</div><div class="d">Tested and executing live — not just "should work"</div><span class="loop-expand">+</span></summary>
       <div class="loop-detail"><b>Confirmed</b>Three manual test executions with synthetic data — all wrote clean to the CRM. Activated the workflow and confirmed the first live execution succeeded. Closed out.</div>
     </details>
   </div>
-  <p class="loop-cap reveal">Tap any step to see a real example — one bug, followed start to finish.</p>
+  <p class="loop-cap reveal">Tap any step — watch the canvas below react.</p>
+
+  <div class="n8n-canvas reveal" id="bug-canvas" data-stage="default">
+    <div class="n8n-nodes">
+      <div class="n8n-node trigger"><span class="dot"></span>Webhook</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node logic"><span class="dot"></span>Filter</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node logic"><span class="dot"></span>Set Fields</div>
+      <div class="n8n-connector"></div>
+      <div class="n8n-node action crm"><span class="dot"></span>CRM Write</div>
+      <div class="n8n-connector c4"></div>
+      <div class="n8n-node action send"><span class="dot"></span>Send Email</div>
+    </div>
+    <div class="bug-live-cap" id="bug-caption">Auditing the workflow — nothing confirmed yet</div>
+  </div>
 
   <div class="rule-box reveal">
     <div class="rb-title">⚡ WHAT "DONE" MEANS HERE</div>
@@ -262,6 +302,27 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  const bugCanvas = document.getElementById('bug-canvas');
+  const bugCaption = document.getElementById('bug-caption');
+  const stageOrder = [
+    ['verify', document.getElementById('step-verify'), 'All nodes executing clean — workflow fully restored'],
+    ['fix', document.getElementById('step-fix'), 'Field mapping corrected — CRM Write passing again'],
+    ['approval', document.getElementById('step-approval'), 'Client approved the fix — same failure, not yet touched'],
+    ['report', document.getElementById('step-report'), 'CRM Write found failing — Send Email never fires'],
+    ['audit', document.getElementById('step-audit'), 'Auditing the workflow — nothing confirmed yet']
+  ];
+  function updateBugStage() {
+    let stage = 'default';
+    let caption = 'Auditing the workflow — nothing confirmed yet';
+    for (const [name, el, cap] of stageOrder) {
+      if (el && el.open) { stage = name; caption = cap; break; }
+    }
+    bugCanvas.setAttribute('data-stage', stage);
+    bugCaption.textContent = caption;
+  }
+  stageOrder.forEach(([, el]) => { if (el) el.addEventListener('toggle', updateBugStage); });
+  updateBugStage();
 </script>
 
 </body>
