@@ -5,65 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Joshua Todd — Portfolio</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --navy: #2A2F36; --navy-light: #353c45; --navy-lighter: #404850;
-    --page-dark: #060914;
-    --peach: #FF9B5E;
-    --offwhite: #F0F2F5; --muted: #9EA4AD;
-    --teal: #2dd4bf;
-  }
-  body {
-    font-family:'Manrope',sans-serif; background:var(--page-dark); color:var(--offwhite);
-    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:60px 24px; text-align:center;
-    background:radial-gradient(ellipse at 50% -20%, rgba(255,155,94,0.14) 0%, transparent 55%), linear-gradient(180deg, var(--navy) 0%, var(--page-dark) 85%);
-  }
-  .badge-logo { width:76px; height:76px; background:var(--peach); border-radius:18px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; color:#1c1207; margin-bottom:24px; box-shadow:0 18px 50px rgba(255,155,94,0.25); }
-  h1 { font-size:clamp(26px, 4.4vw, 40px); font-weight:800; letter-spacing:-0.5px; }
-  p.tagline { color:var(--muted); font-size:clamp(15px, 2vw, 18px); margin-top:12px; max-width:520px; }
-
-  .links { display:flex; flex-direction:column; gap:14px; margin-top:44px; width:100%; max-width:480px; }
-  .link-card {
-    display:flex; align-items:center; gap:16px; text-decoration:none; text-align:left;
-    background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:14px;
-    padding:20px 22px; transition:transform 0.2s ease, border-color 0.2s ease;
-  }
-  .link-card:hover { transform:translateY(-3px); border-color:var(--peach); }
-  .link-card .lc-icon { font-size:26px; flex-shrink:0; }
-  .link-card .lc-title { font-weight:800; font-size:16px; color:var(--offwhite); }
-  .link-card .lc-desc { font-size:13px; color:var(--muted); margin-top:2px; }
-  .link-card.peach .lc-title { color:var(--peach); }
-  .link-card.teal .lc-title { color:var(--teal); }
-
-  footer { margin-top:56px; color:var(--muted); font-size:12px; }
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+--navy: #2A2F36; --navy-light: #353c45; --navy-lighter: #404850;
+--page-dark: #060914;
+--peach: #FF9B5E;
+--offwhite: #F0F2F5; --muted: #9EA4AD;
+--teal: #2dd4bf;
+}
+body {
+font-family:'Manrope',sans-serif; background:var(--page-dark); color:var(--offwhite);
+min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+padding:60px 24px; text-align:center;
+background:radial-gradient(ellipse at 50% -20%, rgba(255,155,94,0.14) 0%, transparent 55%), linear-gradient(180deg, var(--navy) 0%, var(--page-dark) 85%);
+}
+.badge-logo { width:76px; height:76px; background:var(--peach); border-radius:18px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; color:#1c1207; margin-bottom:24px; box-shadow:0 18px 50px rgba(255,155,94,0.25); }
+h1 { font-size:clamp(26px, 4.4vw, 40px); font-weight:800; letter-spacing:-0.5px; }
+p.tagline { color:var(--muted); font-size:clamp(15px, 2vw, 18px); margin-top:12px; max-width:520px; }
+.links { display:flex; flex-direction:column; gap:14px; margin-top:44px; width:100%; max-width:480px; }
+.link-card {
+display:flex; align-items:center; gap:16px; text-decoration:none; text-align:left;
+background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:14px;
+padding:20px 22px; transition:transform 0.2s ease, border-color 0.2s ease;
+}
+.link-card:hover { transform:translateY(-3px); border-color:var(--peach); }
+.link-card .lc-icon { font-size:26px; flex-shrink:0; }
+.link-card .lc-title { font-weight:800; font-size:16px; color:var(--offwhite); }
+.link-card .lc-desc { font-size:13px; color:var(--muted); margin-top:2px; }
+.link-card.peach .lc-title { color:var(--peach); }
+.link-card.teal .lc-title { color:var(--teal); }
+footer { margin-top:56px; color:var(--muted); font-size:12px; }
 </style>
 </head>
 <body>
-
-  <div class="badge-logo">JT</div>
-  <h1>Joshua Todd</h1>
-  <p class="tagline">n8n automation &amp; workflow debugging — diagnostic-first, verified running.</p>
-
-  <div class="links">
-    <a class="link-card peach" href="./n8n_automation_intro.html">
-      <span class="lc-icon">🔧</span>
-      <span>
-        <span class="lc-title">n8n Automation &amp; Workflow Debugging</span><br>
-        <span class="lc-desc">The diagnostic process, service menu, and how I handle your data</span>
-      </span>
-    </a>
-    <a class="link-card teal" href="./rts_app_intro.html">
-      <span class="lc-icon">🗺️</span>
-      <span>
-        <span class="lc-title">RouteToServe</span><br>
-        <span class="lc-desc">A production app I build and maintain — the proof this discipline is real</span>
-      </span>
-    </a>
-  </div>
-
-  <footer>Joshua Todd · Portfolio · July 2026</footer>
-
+<div class="badge-logo">JT</div>
+<h1>Joshua Todd</h1>
+<p class="tagline">n8n automation &amp; workflow debugging — diagnostic-first, verified running.</p>
+<div class="links">
+<a class="link-card peach" href="./n8n_automation_intro.html">
+<span class="lc-icon">🔧</span>
+<span>
+<span class="lc-title">n8n Automation &amp; Workflow Debugging</span><br>
+<span class="lc-desc">The diagnostic process, service menu, and how I handle your data</span>
+</span>
+</a>
+<a class="link-card teal" href="./rts_app_intro.html">
+<span class="lc-icon">🗺️</span>
+<span>
+<span class="lc-title">RouteToServe</span><br>
+<span class="lc-desc">A production app I build and maintain — the proof this discipline is real</span>
+</span>
+</a>
+<a class="link-card peach" href="./rts_case_study.html">
+<span class="lc-icon">📋</span>
+<span>
+<span class="lc-title">Case Study: Directing an AI Coding Agent</span><br>
+<span class="lc-desc">Spec-driven development, a real production incident, and how it got fixed for good</span>
+</span>
+</a>
+</div>
+<footer>Joshua Todd · Portfolio · August 2026</footer>
 </body>
 </html>

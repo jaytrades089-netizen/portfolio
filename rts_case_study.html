@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building RouteToServe — Case Study</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #2A2F36; --navy-light: #353c45; --navy-lighter: #404850;
+  --page-dark: #060914;
+  --peach: #FF9B5E; --peach-dim: rgba(255,155,94,0.15);
+  --offwhite: #F0F2F5; --muted: #9EA4AD; --muted-dim: rgba(158,164,173,0.2);
+  --teal: #2dd4bf; --teal-dim: rgba(45,212,191,0.12);
+  --blue: #60a5fa; --amber: #e0a84a; --green: #4ade80;
+}
+body { font-family:'Manrope',sans-serif; background:var(--page-dark); color:var(--offwhite); line-height:1.7; overflow-x:hidden; }
+.hero { min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:70px 24px 50px; position:relative; background:radial-gradient(ellipse at 50% -20%, rgba(255,155,94,0.14) 0%, transparent 55%), linear-gradient(180deg, var(--navy) 0%, var(--page-dark) 85%); }
+.hero .badge-logo { width:76px; height:76px; background:var(--peach); border-radius:18px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; color:#1c1207; margin-bottom:24px; box-shadow:0 18px 50px rgba(255,155,94,0.25); }
+.hero .eyebrow { font-size:13px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--peach); margin-bottom:14px; }
+.hero h1 { font-size:clamp(28px, 5vw, 46px); font-weight:800; letter-spacing:-1px; max-width:820px; }
+.hero .tagline { font-size:clamp(16px, 2.2vw, 20px); color:var(--muted); margin-top:16px; max-width:640px; }
+.wrap { max-width:800px; margin:0 auto; padding:24px; }
+h2.sec { font-size:13px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--peach); margin:64px 0 8px; }
+h3.sec-title { font-size:clamp(21px, 3vw, 28px); font-weight:800; letter-spacing:-0.4px; margin:0 0 16px; }
+p.body { color:var(--offwhite); margin:0 0 16px; font-size:16px; }
+p.body .em { color:var(--peach); font-weight:700; }
+ul.body-list { margin:0 0 16px 20px; }
+ul.body-list li { color:var(--offwhite); font-size:16px; margin-bottom:8px; }
+.rule-box { background:var(--navy-light); border:1px solid var(--navy-lighter); border-left:5px solid var(--peach); border-radius:12px; padding:22px 24px; margin:24px 0; }
+.rule-box .rb-title { font-weight:800; color:var(--peach); font-size:14px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+.rule-box p { color:var(--offwhite); font-size:15px; margin:0 0 8px; }
+.rule-box p:last-child { margin-bottom:0; }
+.quote-block { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:20px 22px; margin:18px 0; font-size:14.5px; }
+.quote-block .qb-label { font-weight:800; color:var(--teal); font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; }
+.quote-block p { color:var(--offwhite); margin-bottom:10px; }
+.quote-block p:last-child { margin-bottom:0; }
+.quote-block .said { font-style:italic; color:var(--muted); border-left:3px solid var(--peach); padding-left:14px; }
+.incident-grid { display:grid; gap:14px; margin:20px 0; }
+.incident-card { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:12px; padding:18px 20px; }
+.incident-card .ic-label { font-weight:800; font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+.incident-card.red .ic-label { color:#f87171; }
+.incident-card.amber .ic-label { color:var(--amber); }
+.incident-card.green .ic-label { color:var(--green); }
+.incident-card p { color:var(--muted); font-size:14.5px; }
+table.demo { width:100%; border-collapse:collapse; margin:20px 0; font-size:14.5px; }
+table.demo th { text-align:left; color:var(--peach); font-weight:800; font-size:12px; letter-spacing:1px; text-transform:uppercase; padding:10px 14px; border-bottom:2px solid var(--navy-lighter); }
+table.demo td { padding:12px 14px; border-bottom:1px solid var(--navy-lighter); color:var(--offwhite); }
+table.demo tr:last-child td { border-bottom:none; }
+.big-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0; }
+.bstat { background:var(--navy-light); border:1px solid var(--navy-lighter); border-radius:14px; padding:20px 14px; text-align:center; }
+.bstat .v { font-size:30px; font-weight:800; color:var(--peach); }
+.bstat .l { font-size:11px; color:var(--muted); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+.callout { background:var(--navy-light); border:1px solid var(--navy-lighter); border-left:4px solid var(--teal); border-radius:10px; padding:16px 18px; margin:20px 0; font-size:14.5px; color:var(--muted); }
+.callout b { color:var(--teal); }
+footer { text-align:center; color:var(--muted); font-size:12px; padding:60px 20px 70px; }
+footer .tagline-end { font-size:17px; font-weight:800; color:var(--offwhite); margin-bottom:8px; }
+footer .tagline-end .accent { color:var(--peach); }
+footer a { color:var(--peach); text-decoration:none; }
+footer a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+<div class="badge-logo">RTS</div>
+<div class="eyebrow">Case Study</div>
+<h1>How I Direct an AI Coding Agent to Ship Production Software</h1>
+<p class="tagline">RouteToServe: a real app, real users, a real incident — and the spec-driven process behind it.</p>
+</div>
+
+<div class="wrap">
+
+<h2 class="sec">The Problem</h2>
+<h3 class="sec-title">Built for the office, not the field</h3>
+<p class="body">I've worked as a process server since 2025 — serving legal documents across multiple stops a day, tracking chain-of-custody, hitting filing deadlines. Within a few weeks I could already see what was missing: the tools that existed gathered information about a route after the fact, instead of actually supporting the person driving it. No route optimization, no offline-first attempt logging, no real reconciliation between what got served, mailed, or returned and what the pay should be.</p>
+<p class="body">Nobody was going to build the tool that fixed this for the field side. So I built it myself — self-taught, through two earlier iterations before arriving at what exists now. Not by learning to write production code from scratch, but by learning to direct the people, and increasingly the AI, who could.</p>
+
+<h2 class="sec">The Approach</h2>
+<h3 class="sec-title">Spec-driven development</h3>
+<p class="body">RouteToServe is a React/Vite mobile app running on Base44, synced to GitHub. I own the product end-to-end — architecture, roadmap, brand, database schema — but I don't write the code myself. Early on I wrote every instruction from scratch by hand, re-explaining the same guardrails every time. Since then that discipline has become an actual workflow: a system that carries the rules for me, so I'm directing the work instead of re-deriving the process on every change.</p>
+<ul class="body-list">
+<li>I talk through what needs to happen in plain conversation — not a rigid template. I describe the problem the way I'd explain it to a person.</li>
+<li>The system turns that into a structured, auditable spec automatically — guardrails, file scope, "what does done look like" all carried in from a standing rule set, not retyped every time.</li>
+<li>An AI coding agent (Claude) executes against that spec through a written handoff document — an auditable contract, not a loose back-and-forth lost in a chat log.</li>
+<li>The agent audits before it builds — reads the real files fresh, reports what it found, holds for approval before touching anything.</li>
+<li>I review and approve every change before it ships. Nothing reaches production without passing gates: linting, dependency-cruiser checks, duplicate-code detection, and custom audit checks that block entire known bug classes from ever landing again.</li>
+</ul>
+<p class="body">That last point is the part that actually proves the process works. Here's a real example.</p>
+
+<h2 class="sec">A Real Incident</h2>
+<h3 class="sec-title">The role-enum bug</h3>
+<p class="body">Base44, the platform RouteToServe runs on, has a <span class="em">User.role</span> field. I assumed — reasonably, based on how the app was designed — that it supported values like 'admin', 'user', 'server', 'boss', and 'worker'. Most of the early role-based logic in the app was written comparing against those values.</p>
+<p class="body">It actually only ever supports two: <span class="em">'admin'</span> and <span class="em">'user'</span>. Every comparison like <span class="em">role === 'server'</span> was silently, permanently false — it could never evaluate true, no matter what. This wasn't a typo or an edge case. It was a wrong assumption baked into the foundation, and it produced two separate production incidents months apart.</p>
+
+<div class="incident-grid">
+<div class="incident-card red"><div class="ic-label">Incident one</div><p>A serve-write guard silently failed for real users.</p></div>
+<div class="incident-card red"><div class="ic-label">Incident two</div><p>An entire background sync engine never activated for anyone, on any account, because the mount condition checked a role value that could never match.</p></div>
+</div>
+
+<p class="body">The fix wasn't just patching the two bugs — that would've left the same landmine in the ground for the next feature.</p>
+<div class="incident-grid">
+<div class="incident-card amber"><div class="ic-label">1 — Diagnose fully</div><p>Root cause confirmed in code before any fix was written: the specific field, the specific values, the specific reason the comparison could never be true.</p></div>
+<div class="incident-card amber"><div class="ic-label">2 — Canonical source</div><p>Built two predicate functions — <span style="color:var(--offwhite)">isAdminUser</span>, <span style="color:var(--offwhite)">isFieldWorker</span> — as the one true source for role logic. No other file may duplicate the check.</p></div>
+<div class="incident-card green"><div class="ic-label">3 — Automated gate</div><p>Added a grep-based audit that runs before every push and hard-blocks any code comparing against a banned role literal like 'server' or 'boss'. Not a style guideline — a gate that fails the build.</p></div>
+</div>
+<div class="callout"><b>That bug class hasn't recurred</b> — because the system no longer allows the mistake that caused it, not because everyone just remembered to be careful.</div>
+
+<h2 class="sec">What a Real Spec Looks Like</h2>
+<h3 class="sec-title">An actual handoff, lightly trimmed</h3>
+<div class="quote-block">
+<div class="qb-label">What I actually said to kick it off</div>
+<p class="said">"The [sync banner] doesn't work. We have tried it and it doesn't work like we want it to. Honestly the banner should just be moved to the settings screen so that way we know there is nothing covering it and we can click it if need be from there."</p>
+</div>
+<div class="quote-block">
+<div class="qb-label">Type</div>
+<p>BUILD. Two labeled commits, commit-and-hold — report SHAs + gate exit codes, push nothing until I say "push it."</p>
+<div class="qb-label" style="margin-top:14px;">Why</div>
+<p>The home-screen sync banner has been a recurring pain point — intermittently false counts, a Retry tap that got swallowed, no way to inspect the parked data from the installed mobile app. My decision: sync surfacing leaves the home screen entirely, and Settings gains a section that's both the control surface and the field evidence tool.</p>
+<div class="qb-label" style="margin-top:14px;">Guardrails</div>
+<p>UNTOUCHABLE: the outbox drain engine, the blob store, the attempt actions, and the evidence capture logic — all off-limits except one explicitly permitted read-only export. This build surfaces sync truth; it does not change sync behavior. No opportunistic fixes, however obvious once the data's visible. No new dependencies. Anything outside the settings screen and the one permitted export → stop and ask, don't improvise.</p>
+<div class="qb-label" style="margin-top:14px;">Output</div>
+<p>Two labeled commits, gate results (audit exit 0, build exit 0, lint at baseline), report: SHAs, line counts of touched files, confirmation home renders zero sync UI. Hold for my "push it."</p>
+</div>
+<p class="body">That's what "spec-driven" actually means in practice — not a vague ask, a written contract with explicit boundaries, a stated reason, and a defined shape for what "done" has to prove.</p>
+
+<h2 class="sec">Day to Day</h2>
+<h3 class="sec-title">The patterns that hold it together</h3>
+<ul class="body-list">
+<li><span class="em">One true source, no duplication.</span> Canonical logic for pay calculation, address validation, name matching, and role checks each live in exactly one place.</li>
+<li><span class="em">Diagnostic-first, always.</span> The agent audits and reports before it edits, every time. If two attempts at a fix fail, we stop and revert rather than guessing a third time.</li>
+<li><span class="em">Field-verify after push, never before.</span> The app only runs by pulling from GitHub through Base44 — so testing locally proves nothing about what a real user will experience. Not "done" until confirmed against production, on the actual device, in the field.</li>
+<li><span class="em">File-size and complexity limits, enforced not aspirational.</span> Once a component crosses its ceiling, it gets split before more gets added.</li>
+<li><span class="em">Offline-first is unconditional.</span> Every user action writes locally first with instant confirmation, then syncs in the background. A dead cell signal can't be allowed to lose someone's work.</li>
+<li><span class="em">The system verifies its own work.</span> After any write that matters, the process reads the file back and confirms the change actually landed — closing the gap where an AI agent can report success when it didn't.</li>
+</ul>
+
+<h2 class="sec">The Result</h2>
+<h3 class="sec-title">In daily production use</h3>
+<p class="body">RouteToServe runs real routes for me daily, and for a second user, Dawn — a veteran process server who runs roughly three times my volume through the same system. It handles route optimization, offline-first attempt logging, payroll reconciliation, and document tracking, with a real incident history, a real audit trail, and a real roadmap I manage.</p>
+
+<div class="big-stats">
+<div class="bstat"><div class="v">~410</div><div class="l">my tracked events / month</div></div>
+<div class="bstat"><div class="v">~3×</div><div class="l">Dawn's volume vs. mine</div></div>
+<div class="bstat"><div class="v">1,500+</div><div class="l">tracked field events / month, combined</div></div>
+</div>
+<p class="body" style="font-size:14px; color:var(--muted);">Mine, tracked directly: ~349 serve-type attempts/month, ~57 posting, ~8 garnishment. Dawn's posting and garnishment run at similar levels to mine, on top of her higher attempt volume — all offline-first, all reconciled against pay automatically.</p>
+
+<h2 class="sec">What This Demonstrates</h2>
+<h3 class="sec-title">Translated to what it's actually called</h3>
+<table class="demo">
+<tr><th>What I did</th><th>What it's actually called</th></tr>
+<tr><td>Wrote detailed specs before any code was touched</td><td>Requirements definition / PRD writing</td></tr>
+<tr><td>Directed an AI agent through structured, auditable handoffs</td><td>AI orchestration / spec-driven development</td></tr>
+<tr><td>Root-caused a production incident to its actual source before fixing it</td><td>Diagnostic rigor / root-cause analysis</td></tr>
+<tr><td>Turned a one-off fix into a system-wide, automated guardrail</td><td>Architecture thinking / technical debt prevention</td></tr>
+<tr><td>Gated every release behind quality checks before it reached users</td><td>Release management / QA discipline</td></tr>
+<tr><td>Owned the roadmap, brand consistency, and schema design</td><td>Product management</td></tr>
+<tr><td>Verified every fix against live field use, not just a local test</td><td>User-centered validation</td></tr>
+</table>
+<p class="body">I've learned this by doing it, on a real product, with real users, for the better part of a year — not by studying it in the abstract. I'm not trying to present myself as someone who could pass a coding interview. I'm someone who can specify a problem precisely, direct the right execution, catch what's wrong before it ships, and explain exactly why a fix works — which is, increasingly, what the job of directing AI-assisted product development actually is.</p>
+
+</div>
+
+<footer>
+<div class="tagline-end">All you have to do is drive and knock.<br><span class="accent">RouteToServe has the rest.</span></div>
+<p style="margin-top:10px;"><a href="./rts_app_intro.html">← Back to RouteToServe overview</a> &nbsp;·&nbsp; <a href="./index.html">Portfolio home</a></p>
+<p style="margin-top:14px;">Joshua Todd · Case Study · August 2026</p>
+</footer>
+
+</body>
+</html>
