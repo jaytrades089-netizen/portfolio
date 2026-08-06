@@ -90,6 +90,26 @@ footer a:hover { text-decoration:underline; }
 <div class="pillar-row"><div class="pillar-num">5</div><div><div class="p-title">Deployment/production literacy</div><p>How software actually ships — the layer between "works on my machine" and "works for real users," which RTS's own production incidents have made concrete.</p></div></div>
 <div class="pillar-row"><div class="pillar-num">6</div><div><div class="p-title">Evals &amp; quality-checking</div><p>Building a real eval against RTS's own OCR scan-in pipeline — deterministic scorers plus an LLM-as-judge, validated against a hand-labeled set.</p></div></div>
 
+<h2 class="sec">The North Star vs. the Real Plan</h2>
+<h3 class="sec-title">Two destinations, kept deliberately separate</h3>
+<p class="body">It would've been easy to write one plan and call it done. I split it into two on purpose, because they require genuinely different things and conflating them wastes both.</p>
+<div class="grid3">
+<div class="card"><div class="c-title purple">🌟 North star (aspirational, multi-year)</div><p>Elite Forward Deployed Engineer roles — Palantir, OpenAI, Scale AI tier. Real hands-on coding and infrastructure depth, T-shaped: deep engineering plus broad range. Requires actually being the builder, not just the director of AI. This is where ambition points, not where next week's plan lives.</p></div>
+<div class="card"><div class="c-title teal">🎯 Real plan (the actual near-term target)</div><p>AI Implementation Specialist / Agentic Workflow Designer tier — business-fluent, technically literate enough to direct, interpret, and quality-check AI output, and explain the decisions to stakeholders. This is the profile I already have real evidence for, from RouteToServe itself.</p></div>
+</div>
+<p class="body">The honest tension: my own instinct going in was closer to <span class="em">"I don't need to know how to do things the traditional way, I just need to know how to direct someone who can"</span> — which describes the real plan accurately, but directly contradicts what the north star actually requires. Rather than pretend that tension away, I named it and resolved it on paper: the north star stays the north star, informing stretch goals and keeping ambition honest, without quietly becoming the operating plan and burning the realistic timeline.</p>
+
+<h2 class="sec">The Six-Week Sprint</h2>
+<h3 class="sec-title">Orientation first, depth later — deliberately in that order</h3>
+<p class="body">The sprint's job isn't mastery. It's knowing the map — what each pillar actually requires, where the real gaps sit, and which pillars can lean on work already being done on RouteToServe. Depth comes after, over the following year, once the sequencing decision is actually informed instead of guessed at.</p>
+
+<div class="pillar-row"><div class="pillar-num">W1</div><div><div class="p-title">Orientation + Pillar 1 formalize + Pillar 3 confirm</div><p>Name what I already do (AI/tool fluency), confirm what I already know (technical foundation), take the first bite of the biggest gap (agentic systems).</p></div></div>
+<div class="pillar-row"><div class="pillar-num">W2</div><div><div class="p-title">Pillar 2 core: MCP + Claude API</div><p>Understand the protocol I already use daily well enough to explain it, plus the heaviest single technical course in the sprint.</p></div></div>
+<div class="pillar-row"><div class="pillar-num">W3</div><div><div class="p-title">Pillar 2 continued: agent patterns + orchestration</div><p>Multi-agent patterns, tool use, planning — the design patterns that make "agentic" different from "chatbot," mapped back onto my own two-instance Claude workflow.</p></div></div>
+<div class="pillar-row"><div class="pillar-num">W4</div><div><div class="p-title">Pillar 2 capstone</div><p>Vendor-neutral synthesis — the same patterns outside any one company's framing, so the understanding isn't tied to a single vendor's terminology.</p></div></div>
+<div class="pillar-row"><div class="pillar-num">W5</div><div><div class="p-title">Pillar 6: evals — the artifact week</div><p>This is the week built to produce the strongest differentiator: a real, working eval against RouteToServe's own OCR pipeline.</p></div></div>
+<div class="pillar-row"><div class="pillar-num">W6</div><div><div class="p-title">Pillar 4 (start) + Pillar 5 + wrap-up</div><p>Get business-translation and deployment-awareness moving, then close the sprint honestly: do I now know what I don't know, and roughly where everything lives?</p></div></div>
+
 <h2 class="sec">The Discipline</h2>
 <h3 class="sec-title">The same rules that keep RTS shipping, applied to learning</h3>
 <div class="rule-box">
@@ -132,6 +152,38 @@ footer a:hover { text-decoration:underline; }
 <tr><td>Automated weekly checks so the plan updates itself against a moving market</td><td>Systems thinking applied to personal development</td></tr>
 </table>
 <p class="body">Nobody assigned this. Nobody's grading it. It exists because the fastest way I know to close a real gap is the same process I already trust for shipping software: name the problem precisely, build a system instead of relying on willpower alone, and let the artifacts do the talking.</p>
+
+<h2 class="sec">If You Want to Build Your Own</h2>
+<h3 class="sec-title">The actual replicable steps</h3>
+<p class="body">None of this required permission, a budget, or someone else's curriculum. If you're trying to close a real skill gap on your own, this is roughly the order that worked:</p>
+<div class="rule-box">
+<div class="rb-title">1 — Name the gap precisely, not generically</div>
+<p>"I should learn AI" isn't a gap. "I can direct AI well but can't explain why it did what it did, unprompted, to a stakeholder" is a gap — specific enough to source real material against.</p>
+</div>
+<div class="rule-box">
+<div class="rb-title">2 — Split the destination from the plan</div>
+<p>Write down the aspirational north star honestly, then write down the real near-term target separately. Let the north star keep ambition honest without hijacking next week's schedule.</p>
+</div>
+<div class="rule-box">
+<div class="rb-title">3 — Break the gap into pillars, and check what you already have</div>
+<p>Most gaps aren't six new things — they're two or three genuine gaps sitting next to skills already being practiced somewhere, just not named or formalized yet.</p>
+</div>
+<div class="rule-box">
+<div class="rb-title">4 — Sequence a short orientation pass before a long depth build</div>
+<p>A time-boxed sprint that maps the whole territory beats either "read everything" or "pick one thing and hope it's the right one." Depth decisions get better once you actually know the map.</p>
+</div>
+<div class="rule-box">
+<div class="rb-title">5 — Anchor technical learning against something real you already own</div>
+<p>A real codebase, a real dataset, a real project — anything with actual stakes teaches faster and produces something linkable, unlike a generic tutorial dataset nobody will ever look at again.</p>
+</div>
+<div class="rule-box">
+<div class="rb-title">6 — Build one small daily gate, not just a calendar block</div>
+<p>A short, consistent accountability habit — even 15 minutes — does more than a big weekly time block that's easy to skip when the week gets busy.</p>
+</div>
+<div class="rule-box">
+<div class="rb-title">7 — Let artifacts prove it, not completion</div>
+<p>"I finished a course" convinces nobody, including yourself six months later. Something built, shipped, or shown does the actual convincing.</p>
+</div>
 
 </div>
 
